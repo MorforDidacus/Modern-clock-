@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elegant Analog Clock</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+  /*Designed and developed by Morfor Didacus*/
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            z-index: 10;
+        }
+
+        .title {
+            color: white;
+            text-align: center;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .title h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            font-weight: 300;
+        }
+
+        .title p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .clock-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 30px rgba(0, 0, 0, 0.2),
+                inset 0 0 20px rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .clock {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 
+                inset 0 0 25px rgba(0, 0, 0, 0.15),
+                0 20px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Clock numbers */
+        .number {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            transform: rotate(calc(30deg * var(--i)));
+        }
+
+        .number span {
+            display: inline-block;
+            transform: rotate(calc(-30deg * var(--i)));
+            padding-top: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Clock center */
+        .center-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ff4757;
+            border-radius: 50%;
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(255, 71, 87, 0.7);
+        }
+
+        /* Clock hands */
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom;
+            border-radius: 10px;
+            transform: translateX(-50%);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .hour {
+            width: 8px;
+            height: 80px;
+            background: linear-gradient(to top, #333, #fff);
+            z-index: 1;
+        }
+
+        .minute {
+            width: 6px;
+            height: 120px;
+            background: linear-gradient(to top, #555, #fff);
+            z-index: 2;
+        }
+
+        .second {
+            width: 3px;
+            height: 140px;
+            background: linear-gradient(to top, #ff4757, #ff6b81);
+            z-index: 3;
+        }
+
+        /* Hour markers */
+        .marker {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform: rotate(calc(6deg * var(--j)));
+        }
+
+        .marker::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 15px;
+            background: rgba(255, 255, 255, var(--opacity));
+            border-radius: 2px;
+        }
+
+        /* Digital clock */
+        .digital-clock {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 30px;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Date display */
+        .date-display {
+            color: white;
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 25px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Decorative elements */
+        .decoration {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .circle:nth-child(1) {
+            width: 550px;
+            height: 550px;
+            top: -75px;
+            left: -75px;
+        }
+
+        .circle:nth-child(2) {
+            width: 450px;
+            height: 450px;
+            top: -25px;
+            left: -25px;
+        }
+        
+        .floating {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            animation: float 15s infinite linear;
+        }
+        
+        .floating:nth-child(3) {
+            width: 120px;
+            height: 120px;
+            top: 10%;
+            left: 10%;
+            animation-duration: 20s;
+        }
+        
+        .floating:nth-child(4) {
+            width: 80px;
+            height: 80px;
+            bottom: 15%;
+            right: 15%;
+            animation-duration: 25s;
+            animation-direction: reverse;
+        }
+        
+        .floating:nth-child(5) {
+            width: 60px;
+            height: 60px;
+            top: 30%;
+            right: 20%;
+            animation-duration: 18s;
+        }
+        
+        .floating:nth-child(6) {
+            width: 100px;
+            height: 100px;
+            bottom: 25%;
+            left: 20%;
+            animation-duration: 22s;
+            animation-direction: reverse;
+        }
+        
+        .corner-ornament {
+            position: absolute;
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .corner-ornament:nth-child(1) {
+            top: 20px;
+            left: 20px;
+        }
+        
+        .corner-ornament:nth-child(2) {
+            top: 20px;
+            right: 20px;
+            transform: rotate(90deg);
+        }
+        
+        .corner-ornament:nth-child(3) {
+            bottom: 20px;
+            left: 20px;
+            transform: rotate(-90deg);
+        }
+        
+        .corner-ornament:nth-child(4) {
+            bottom: 20px;
+            right: 20px;
+            transform: rotate(180deg);
+        }
+        
+        .branding {
+            position: absolute;
+            bottom: 30px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(20px, -15px) rotate(90deg);
+            }
+            50% {
+                transform: translate(0, -25px) rotate(180deg);
+            }
+            75% {
+                transform: translate(-20px, -15px) rotate(270deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 500px) {
+            .clock-container {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .clock {
+                width: 260px;
+                height: 260px;
+            }
+            
+            .hour {
+                height: 60px;
+            }
+            
+            .minute {
+                height: 90px;
+            }
+            
+            .second {
+                height: 110px;
+            }
+            
+            .digital-clock {
+                font-size: 1.4rem;
+                padding: 12px 25px;
+            }
+            
+            .date-display {
+                font-size: 1rem;
+            }
+            
+            .title h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="decoration">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="floating"></div>
+        <div class="floating"></div>
+        <div class="floating"></div>
+        <div class="floating"></div>
+        
+        <div class="corner-ornament">
+            <i class="fas fa-circle"></i>
+        </div>
+        <div class="corner-ornament">
+            <i class="fas fa-circle"></i>
+        </div>
+        <div class="corner-ornament">
+            <i class="fas fa-circle"></i>
+        </div>
+        <div class="corner-ornament">
+            <i class="fas fa-circle"></i>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="title">
+            <h1>ELEGANT ANALOG CLOCK</h1>
+            <p>Designed with HTML, CSS & JavaScript</p>
+        </div>
+        
+        <div class="clock-container">
+            <div class="clock">
+                <div class="center-dot"></div>
+                
+                <!-- Hour markers -->
+                <div class="marker" style="--j:0; --opacity:0.4"></div>
+                <div class="marker" style="--j:1; --opacity:0.2"></div>
+                <div class="marker" style="--j:2; --opacity:0.2"></div>
+                <div class="marker" style="--j:3; --opacity:0.2"></div>
+                <div class="marker" style="--j:4; --opacity:0.2"></div>
+                <div class="marker" style="--j:5; --opacity:0.4"></div>
+                <div class="marker" style="--j:6; --opacity:0.2"></div>
+                <div class="marker" style="--j:7; --opacity:0.2"></div>
+                <div class="marker" style="--j:8; --opacity:0.2"></div>
+                <div class="marker" style="--j:9; --opacity:0.2"></div>
+                <div class="marker" style="--j:10; --opacity:0.4"></div>
+                <div class="marker" style="--j:11; --opacity:0.2"></div>
+                <div class="marker" style="--j:12; --opacity:0.2"></div>
+                <div class="marker" style="--j:13; --opacity:0.2"></div>
+                <div class="marker" style="--j:14; --opacity:0.2"></div>
+                <div class="marker" style="--j:15; --opacity:0.4"></div>
+                <div class="marker" style="--j:16; --opacity:0.2"></div>
+                <div class="marker" style="--j:17; --opacity:0.2"></div>
+                <div class="marker" style="--j:18; --opacity:0.2"></div>
+                <div class="marker" style="--j:19; --opacity:0.2"></div>
+                <div class="marker" style="--j:20; --opacity:0.4"></div>
+                <div class="marker" style="--j:21; --opacity:0.2"></div>
+                <div class="marker" style="--j:22; --opacity:0.2"></div>
+                <div class="marker" style="--j:23; --opacity:0.2"></div>
+                <div class="marker" style="--j:24; --opacity:0.2"></div>
+                <div class="marker" style="--j:25; --opacity:0.4"></div>
+                <div class="marker" style="--j:26; --opacity:0.2"></div>
+                <div class="marker" style="--j:27; --opacity:0.2"></div>
+                <div class="marker" style="--j:28; --opacity:0.2"></div>
+                <div class="marker" style="--j:29; --opacity:0.2"></div>
+                <div class="marker" style="--j:30; --opacity:0.4"></div>
+                <div class="marker" style="--j:31; --opacity:0.2"></div>
+                <div class="marker" style="--j:32; --opacity:0.2"></div>
+                <div class="marker" style="--j:33; --opacity:0.2"></div>
+                <div class="marker" style="--j:34; --opacity:0.2"></div>
+                <div class="marker" style="--j:35; --opacity:0.4"></div>
+                <div class="marker" style="--j:36; --opacity:0.2"></div>
+                <div class="marker" style="--j:37; --opacity:0.2"></div>
+                <div class="marker" style="--j:38; --opacity:0.2"></div>
+                <div class="marker" style="--j:39; --opacity:0.2"></div>
+                <div class="marker" style="--j:40; --opacity:0.4"></div>
+                <div class="marker" style="--j:41; --opacity:0.2"></div>
+                <div class="marker" style="--j:42; --opacity:0.2"></div>
+                <div class="marker" style="--j:43; --opacity:0.2"></div>
+                <div class="marker" style="--j:44; --opacity:0.2"></div>
+                <div class="marker" style="--j:45; --opacity:0.4"></div>
+                <div class="marker" style="--j:46; --opacity:0.2"></div>
+                <div class="marker" style="--j:47; --opacity:0.2"></div>
+                <div class="marker" style="--j:48; --opacity:0.2"></div>
+                <div class="marker" style="--j:49; --opacity:0.2"></div>
+                <div class="marker" style="--j:50; --opacity:0.4"></div>
+                <div class="marker" style="--j:51; --opacity:0.2"></div>
+                <div class="marker" style="--j:52; --opacity:0.2"></div>
+                <div class="marker" style="--j:53; --opacity:0.2"></div>
+                <div class="marker" style="--j:54; --opacity:0.2"></div>
+                <div class="marker" style="--j:55; --opacity:0.4"></div>
+                <div class="marker" style="--j:56; --opacity:0.2"></div>
+                <div class="marker" style="--j:57; --opacity:0.2"></div>
+                <div class="marker" style="--j:58; --opacity:0.2"></div>
+                <div class="marker" style="--j:59; --opacity:0.2"></div>
+                
+                <!-- Clock numbers -->
+                <div class="number" style="--i:1"><span>1</span></div>
+                <div class="number" style="--i:2"><span>2</span></div>
+                <div class="number" style="--i:3"><span>3</span></div>
+                <div class="number" style="--i:4"><span>4</span></div>
+                <div class="number" style="--i:5"><span>5</span></div>
+                <div class="number" style="--i:6"><span>6</span></div>
+                <div class="number" style="--i:7"><span>7</span></div>
+                <div class="number" style="--i:8"><span>8</span></div>
+                <div class="number" style="--i:9"><span>9</span></div>
+                <div class="number" style="--i:10"><span>10</span></div>
+                <div class="number" style="--i:11"><span>11</span></div>
+                <div class="number" style="--i:12"><span>12</span></div>
+                
+                <!-- Clock hands -->
+                <div class="hand hour" id="hour-hand"></div>
+                <div class="hand minute" id="minute-hand"></div>
+                <div class="hand second" id="second-hand"></div>
+            </div>
+        </div>
+        
+        <div class="digital-clock" id="digital-clock"></div>
+        <div class="date-display" id="date-display"></div>
+    </div>
+    
+    
+    <script>
+        // Function to update the clock
+        function updateClock() {
+            const now = new Date();
+            
+            // Get time components
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+            const milliseconds = now.getMilliseconds();
+            
+            // Calculate rotations
+            const hourRotation = (hours % 12) * 30 + minutes * 0.5;
+            const minuteRotation = minutes * 6 + seconds * 0.1;
+            const secondRotation = seconds * 6 + milliseconds * 0.006;
+            
+            // Apply rotations to hands
+            document.getElementById('hour-hand').style.transform = `translateX(-50%) rotate(${hourRotation}deg)`;
+            document.getElementById('minute-hand').style.transform = `translateX(-50%) rotate(${minuteRotation}deg)`;
+            document.getElementById('second-hand').style.transform = `translateX(-50%) rotate(${secondRotation}deg)`;
+            
+            // Update digital clock
+            const digitalClock = document.getElementById('digital-clock');
+            digitalClock.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Update date display
+            const dateDisplay = document.getElementById('date-display');
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateDisplay.textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // Initial call to set clock immediately
+        updateClock();
+        
+        // Update clock every 50ms for smooth animation
+        setInterval(updateClock, 50);
+    </script>
+</body>
+</html>
